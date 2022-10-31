@@ -1,11 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
-using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public enum RegionCode
 {
@@ -128,7 +124,7 @@ public class ConnectController : MonoBehaviourPunCallbacks
                 Debug.Log(player.NickName + "is ready? " + ready);
                 
                 if (ready) playersReady++;
-                if (playersReady == PhotonNetwork.CurrentRoom.MaxPlayers) PhotonNetwork.LoadLevel("Game");
+                /*if (playersReady == PhotonNetwork.CurrentRoom.MaxPlayers)*/ PhotonNetwork.LoadLevel("Game");
             }
         }
     }
