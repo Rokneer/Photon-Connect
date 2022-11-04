@@ -90,14 +90,14 @@ public class ConnectController : MonoBehaviourPunCallbacks
     {
         Debug.Log("Launcher: OnJoinedRoom() called by PUN. Now this client is in a room");
         SetButton(false, "Wating for Players");
-        if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
-        {
-            Debug.Log("Room is Ready");
-        }
+        
+        if (PhotonNetwork.CurrentRoom.PlayerCount != 2) return;
+        Debug.Log("Room is Ready");
+        ShowRoomPanel();
     }
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        Debug.Log(newPlayer.NickName + "Number of Player is room: " + PhotonNetwork.CurrentRoom.PlayerCount);
+        Debug.Log(newPlayer.NickName + " has joined. Number of Players in room: " + PhotonNetwork.CurrentRoom.PlayerCount);
         
         if (PhotonNetwork.CurrentRoom.PlayerCount != 2 && PhotonNetwork.IsMasterClient) return;
         Debug.Log("Room is full");
@@ -109,23 +109,32 @@ public class ConnectController : MonoBehaviourPunCallbacks
     {
         if (changedProps.ContainsKey("color"))
         {
-            var playerColor = playerTank.GetComponentInChildren<Renderer>().material;
-            if (changedProps.ContainsValue("Green")) playerColor.SetColor(BaseColor, Color.green);
-            else if (changedProps.ContainsValue("Blue")) playerColor.SetColor(BaseColor, Color.blue);
-            else if (changedProps.ContainsValue("Red")) playerColor.SetColor(BaseColor, Color.red);
-            else if (changedProps.ContainsValue("Yellow")) playerColor.SetColor(BaseColor, Color.yellow);
-        }
-        if (changedProps.ContainsKey("ready"))
-        {
-            int playersReady = 0;
             foreach (var player in PhotonNetwork.CurrentRoom.Players.Values)
             {
-                bool ready = (bool)player.CustomProperties["ready"];
-                Debug.Log(player.NickName + "is ready? " + ready);
-                
-                if (ready) playersReady++;
-                /*if (playersReady == PhotonNetwork.CurrentRoom.MaxPlayers)*/ PhotonNetwork.LoadLevel("Game");
+                if (!player.CustomProperties.ContainsKey("color")) continue;
+
+                bool colorReady = (bool)player.CustomProperties["color"];
+                if (!colorReady) continue;
+
+                var playerColor = playerTank.GetComponentInChildren<Renderer>().material;
+                if (changedProps.ContainsValue("Green")) playerColor.SetColor(BaseColor, Color.green);
+                if (changedProps.ContainsValue("Blue")) playerColor.SetColor(BaseColor, Color.blue);
+                if (changedProps.ContainsValue("Red")) playerColor.SetColor(BaseColor, Color.red);
+                if (changedProps.ContainsValue("Yellow")) playerColor.SetColor(BaseColor, Color.yellow);
             }
+        }
+
+        if (!changedProps.ContainsKey("ready")) return;
+        int playersReady = 0;
+        foreach (var player in PhotonNetwork.CurrentRoom.Players.Values)
+        {
+            if (!player.CustomProperties.ContainsKey("ready")) continue;
+
+            bool ready = (bool)player.CustomProperties["ready"];
+            Debug.Log(player.NickName + "is ready? " + ready);
+                
+            if (ready) playersReady++;
+            if (playersReady == 2) PhotonNetwork.LoadLevel("Game");
         }
     }
 
