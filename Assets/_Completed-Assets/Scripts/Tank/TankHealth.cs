@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Complete
 {
-    public class TankHealth : MonoBehaviour, IPunObservable
+    public class TankHealth : MonoBehaviourPunCallbacks, IPunObservable
     {
         public float m_StartingHealth = 100f;               // The amount of health each tank starts with.
         public Slider m_Slider;                             // The slider to represent how much health the tank currently has.
@@ -55,7 +55,7 @@ namespace Complete
             // If the current health is at or below zero and it has not yet been registered, call OnDeath.
             if (m_CurrentHealth <= 0f && !m_Dead)
             {
-                OnDeath ();
+                photonView.RPC("OnDeath", RpcTarget.AllBuffered);
             }
         }
 
@@ -69,7 +69,7 @@ namespace Complete
             m_FillImage.color = Color.Lerp (m_ZeroHealthColor, m_FullHealthColor, m_CurrentHealth / m_StartingHealth);
         }
 
-
+        [PunRPC]
         private void OnDeath ()
         {
             // Set the flag so that this function is only called once.
@@ -97,7 +97,8 @@ namespace Complete
             }
             else
             {
-                this.m_CurrentHealth = (float)stream.ReceiveNext();
+                m_CurrentHealth = (float)stream.ReceiveNext();
+                SetHealthUI();
             }
         }
     }

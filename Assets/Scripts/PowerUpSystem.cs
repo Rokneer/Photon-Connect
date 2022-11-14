@@ -44,9 +44,9 @@ public class PowerUpSystem : MonoBehaviour, IOnEventCallback
     {
         if (photonEvent.Code != CureEventCode) return;
         Debug.Log("Create Cure");
-        for (int i = 0; i < cureSpawnList.Length; i++)
+        foreach (var spawn in cureSpawnList)
         {
-            Instantiate(curePrefab, cureSpawnList[i]);
+            Instantiate(curePrefab, spawn);
         }
     }
 }

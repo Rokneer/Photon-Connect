@@ -17,10 +17,11 @@ public class ConnectController : MonoBehaviourPunCallbacks
 {
     [SerializeField] private string gameVersion = "1";
     [SerializeField] private string regionCode = null;
+    [SerializeField] private Text nickname;
     [SerializeField] private GameObject panelConnect;
     [SerializeField] private GameObject panelRoom;
-    [SerializeField] private GameObject playerTank;
-    private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+    //[SerializeField] private GameObject playerTank;
+    //private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
 
     void Awake()
     {
@@ -43,15 +44,17 @@ public class ConnectController : MonoBehaviourPunCallbacks
         }
         else
         {
+            nickname.text = PhotonNetwork.NickName;
             PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = gameVersion;
+            ShowRoomPanel();
         }
     }
-    void SetButton(bool state, string msg)
+    /*void SetButton(bool state, string msg)
     {
         GameObject.Find("Button").GetComponentInChildren<Text>().text = msg;
         GameObject.Find("Button").GetComponent<Button>().enabled = state;
-    }
+    }*/
     void ShowRoomPanel()
     {
         panelConnect.SetActive(false);
@@ -64,18 +67,18 @@ public class ConnectController : MonoBehaviourPunCallbacks
         var propsToSet = new ExitGames.Client.Photon.Hashtable() { { "color", color } };
         PhotonNetwork.LocalPlayer.SetCustomProperties(propsToSet);
     }
-    public void SetReady()
+    /*public void SetReady()
     {
         var propsToSet = new ExitGames.Client.Photon.Hashtable() { { "ready", true } };
         PhotonNetwork.LocalPlayer.SetCustomProperties(propsToSet);
-    }
+    }*/
     
     #region MonoBehavioursPunCallbacks Callbacks
 
     public override void OnConnectedToMaster()
     {
         Debug.Log("OnConnectedToMaster() was called by PUN");
-        SetButton(true, "Let's Battle");
+        //SetButton(true, "Let's Battle");
     }
     public override void OnDisconnected(DisconnectCause cause)
     {
@@ -89,11 +92,11 @@ public class ConnectController : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log("Launcher: OnJoinedRoom() called by PUN. Now this client is in a room");
-        SetButton(false, "Wating for Players");
+        //SetButton(false, "Wating for Players");
         
         if (PhotonNetwork.CurrentRoom.PlayerCount != 2) return;
         Debug.Log("Room is Ready");
-        ShowRoomPanel();
+        //ShowRoomPanel();
     }
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
@@ -101,11 +104,12 @@ public class ConnectController : MonoBehaviourPunCallbacks
         
         if (PhotonNetwork.CurrentRoom.PlayerCount != 2 && PhotonNetwork.IsMasterClient) return;
         Debug.Log("Room is full");
-        ShowRoomPanel();
+        PhotonNetwork.LoadLevel("Game");
+        //ShowRoomPanel();
 
     }
 
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    /*public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
         if (changedProps.ContainsKey("color"))
         {
@@ -136,7 +140,7 @@ public class ConnectController : MonoBehaviourPunCallbacks
             if (ready) playersReady++;
             if (playersReady == 2) PhotonNetwork.LoadLevel("Game");
         }
-    }
+    }*/
 
     #endregion
 }

@@ -121,7 +121,7 @@ namespace Complete
             }
             else
             {
-                this.m_IsFiring = (bool)stream.ReceiveNext();
+                m_IsFiring = (bool)stream.ReceiveNext();
             }
         }
     }
